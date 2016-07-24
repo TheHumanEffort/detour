@@ -20,4 +20,33 @@ Now time goes by and we want to add Facebook support, we can add it as trivially
 
 All this, and we never leave the host that the user expects.
 
+## Description
+
+Detour is a set of conventions around composing HTTP applications.  The conventions have to do with how responses are routed.  We also have a simple configuration file format that is likely to expand over time.  We also have a working implementation in Node.  If you want to write your own routers, configuration systems, we welcome feedback.  Once we have a good sense of the features that are required, and the right ways to build things, we'll come up with an RFC around the header names, conventions, etc.  Security is a big concern, so we want to make sure that the fundamentals are good before we go too crazy.
+
+Our configuration file looks like this:
+
+```
+# statistics *://*/*
+
+authenticate:3000 *://*/*
+
+# authorize *://*/*
+
+localtest *://192.168.99.100:*/*
+orienteer-api *://api.orienteer.io/api/*
+orienteer-api *://www.orienteer.io/api/*
+orienteer-api *://orienteer.io/api/*
+```
+
+Comment lines start with `#`, routing lines have an internal host/port, and a host/path glob.  Requests "flow" from top to bottom, and are sent to matching hosts, and non-matching hosts/services are skipped.  At every step, the following happens:
+
+1. If the service has any non-2** response, it is sent to the user (except 404, which signals "continue unchanged")
+2. If the service has a 2** response, it has the option of responding to the user, or allowing the request to continue flowing, optionally adding/removing headers, or changing the path, body, etc.  (support not complete here yet).
+
+## WIP
+
+This is a work in progress!  For now, the testbed only has one "microservice", an authentication gateway.  We'll be spinning up more as we build stuff out.
+
+1) The current example can be run using `docker-compose up`, and then point your browser to your docker host, port 3007.  You will notice a standard devise login/signup mechanism, followed by a Docker Cloud "hello world" page once you've been authenticated.
 
