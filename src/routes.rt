@@ -1,10 +1,10 @@
-statistics *://*/*
+# statistics *://*/*
 
-authenticate *://*/*
+authenticate:3000 *://*/*
 
-authorize *://*/*
+# authorize *://*/*
 
-localtest *://localhost:3001/*
+localtest *://192.168.99.100:*/*
 orienteer-api *://api.orienteer.io/api/*
 orienteer-api *://www.orienteer.io/api/*
 orienteer-api *://orienteer.io/api/*

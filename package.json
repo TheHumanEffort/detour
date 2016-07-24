@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "bluebird": "^3.4.1",
+    "hyperquest": "^2.0.0",
     "koa": "^1.2.1"
   }
 }
