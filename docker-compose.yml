@@ -2,17 +2,32 @@ authenticate:
   build: test/authenticate
   volumes:
     - ./test/authenticate:/application
-  
+  links:
+    - postgres
+  ports:
+    - 3008:3000
+  command: rails s -p 3000 -b 0.0.0.0 -P /tmp/server.pid
+
+postgres:
+  image: postgres:9.4
+  environment:
+    - POSTGRES_USER=pguser
+    - POSTGRES_PASSWORD=pgpass
+
 localtest:
+  ports:
+    - 3009:80
   image: dockercloud/hello-world
 
 router:
   build: .
+  environment:
+    - PORT=3000
   volumes:
-    - ./src:/application
-  command: node kernel.js
+    - .:/application
+  command: ["bash","-c","cd src && nodemon router.js"]
   ports:
-    - 3007:3007
+    - 3007:3000
   links:
     - localtest
     - authenticate

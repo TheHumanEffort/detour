@@ -12,4 +12,4 @@ COPY package.json /application
 RUN npm install
 COPY . /application
 
-CMD [ "bash","-c","cd src && nodemon kernel.js" ]
+CMD [ "bash","-c","cd src && nodemon router.js" ]
