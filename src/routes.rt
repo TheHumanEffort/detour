@@ -1,0 +1,11 @@
+statistics *://*/*
+
+authenticate *://*/*
+
+authorize *://*/*
+
+localtest *://localhost:3001/*
+orienteer-api *://api.orienteer.io/api/*
+orienteer-api *://www.orienteer.io/api/*
+orienteer-api *://orienteer.io/api/*
+

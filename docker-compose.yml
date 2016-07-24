@@ -1,0 +1,16 @@
+authenticate:
+  build: test/authenticate
+
+localtest:
+  image: dockercloud/hello-world
+
+router:
+  build: .
+  volumes:
+    - ./src:/application
+  command: node kernel.js
+  ports:
+    - 3007:3007
+  links:
+    - localtest
+    - authenticate
