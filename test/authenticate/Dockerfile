@@ -1,7 +1,7 @@
 FROM ruby:2.3.1
 
 RUN apt-get update -qq && \
-    apt-get install -y libpq-dev libpq5 nodejs wkhtmltopdf && \
+    apt-get install -y libpq-dev libpq5 nodejs && \
     apt-get clean && \
     apt-get autoclean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
@@ -15,6 +15,8 @@ EXPOSE 3005
 
 ADD Gemfile* $APP_HOME/
 RUN bundle install
+
+ENV DATABASE_NAME authenticate
 
 ADD . $APP_HOME
 ADD config/database.docker.yml $APP_HOME/config/database.yml

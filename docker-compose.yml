@@ -1,6 +1,8 @@
 authenticate:
   build: test/authenticate
-
+  volumes:
+    - ./test/authenticate:/application
+  
 localtest:
   image: dockercloud/hello-world
 
