@@ -38,6 +38,7 @@ var app = koa();
 
 app.use(function *() {
   var reqUuid = uuid();
+  this.requestUuid = reqUuid;
 
   var host = this.request.host;
   var path = this.request.path;

@@ -14,6 +14,8 @@
   "dependencies": {
     "bluebird": "^3.4.1",
     "hyperquest": "^2.0.0",
-    "koa": "^1.2.1"
+    "koa": "^1.2.1",
+    "bunyan": "~1.8.1",
+    "concat-stream": "~1.5.1"
   }
 }

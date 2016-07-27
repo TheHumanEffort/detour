@@ -1,5 +1,8 @@
+var log = require('./log');
+var fileLog = log;
 var stream = require('stream');
 var hyperquest = require('hyperquest');
+var concat = require('concat-stream');
 
 function stripPrivateHeaders(headers) {
   var out = {};
@@ -35,16 +38,15 @@ function pipeOut(external, internal, response) {
 module.exports = function(external, middleware) {
   // call cb() when we're done processing, with true if we are done
   // and should return.
+  var log = fileLog.child({ request: external.requestUuid });
 
   var host = external.request.host;
   var path = external.request.path;
   var url = 'http://' + middleware + path;
 
-  //  console.log('Method: ', external.request.method);
-
+  log.info({ method: external.request.method, host: host, path: path, headers: external.request.headers }, 'Request received');
   var headers = Object.assign({}, external.request.headers, external.internalHeaders, { host: host });
-
-  //  console.log('Headers: ', headers);
+  log.trace({ external: external.request.headers, internal: external.internalHeaders, host: host, result: headers }, 'Headers extended');
 
   var options = { headers: headers,
                   method: external.request.method,
@@ -53,7 +55,37 @@ module.exports = function(external, middleware) {
   var internal = hyperquest(url, options);
 
   if (external.request.method != 'GET') {
-    external.req.pipe(internal);
+    log.trace(external.request.method + ' request, forwarding...');
+    if (external.requestPiped) {
+      log.trace('Replaying request, original already played.');
+      if (external.requestCache) {
+        log.trace('Cache already complete, replaying now.');
+        internal.write(external.requestCache);
+        internal.end();
+      } else {
+        log.trace('Waiting for cache....');
+        external.requestCacheWaiters = external.requestCacheWaiters || [];
+        external.requestCacheWaiters.push(function(cache) {
+          log.trace('Cache complete, replaying.');
+          internal.write(cache);
+          internal.end();
+        });
+      }
+    } else {
+      log.trace('Fresh request, piping directly (and saving cache for later)');
+
+      external.requestPiped = true;
+
+      external.requestConcat = concat(function(cache) {
+        log.trace('Request concatenation complete.  Saving and calling back.');
+        external.requestCache = cache;
+        delete external.requestConcat;
+        while (external.requestCacheWaiters) externalCacheWaiters.pop().call(cache);
+      });
+
+      external.req.pipe(external.requestConcat);
+      external.req.pipe(internal);
+    }
   }
 
   return function(cb) {
